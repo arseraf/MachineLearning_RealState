@@ -1,52 +1,45 @@
 ![HenryLogo](https://d31uz8lwfmyn8g.cloudfront.net/Assets/logo-henry-white-lg.png)
 ​
-# Proyecto individual 2
+# Modelo de Machine Learning para el mercado inmobiliario colombiano.
+​Por Ariel Serafini
+
 ​
-¡Bienvenidos al segundo proyecto! Durante estos días estarán poniendo en práctica sus habilidades en el campo de la predicción. Deberán usar cierta métrica para medir la performance del modelo la cual, a su vez, será usada para elegir los mejores modelos.
+El objetivo de este proyecto era implementar un modelo de clasificación que permita clasificar el precio de las propiedades en venta, utilizando los datos que se han puesto a su disposición correspondientes al año 2020. La categorización de las propiedades constó en dividirlas entre las consideradas baratas o caras, considerando como criterio el valor promedio de los precios. 
+
+
 ​
-## Información relevante
+## Exploratory Data Analysis & Data Preprocessing
 ​
-Este proyecto es una instancia de evaluación, por lo cual es INDIVIDUAL y OBLIGATORIO para los alumnos de Data Science de Henry. Se disponibilizará un Google Form y pueden cargarse los resultados las veces que quieran. Es obligatorio que todos disponibilicen el código utilizado, para validar los modelos construidos.
-​
-## Mercado inmobiliario
-​
-Dentro de la sociedad globalizada e industrializada, es sabido que los precios de los inmuebles han presentado un constante cambio, por lo que quienes deseen invertir o vender una propiedad se enfrentan al fenómeno especulativo existente en la valorización de éstos. Esto, debido a la constante tendencia de las ciudades a crecer demográfica y comercialmente, llegando a un punto en donde no se tiene certeza de la valorización real dentro del sector en donde se desee invertir. 
-​
-Pese a que el precio depende, en cierta medida, de las tendencias que esté teniendo el mercado inmobiliario en un determinado tiempo, poder estimar adecuadamente el valor de una propiedad es una referencia clave para entender si es una buena oportunidad, ya sea de compra o de venta.
-​
-## Descripción del problema
-​
-Usted ha sido contactado de una importante empresa inversora dentro del rubro de la inmobiliaria en Colombia, con el fin de que implemente un modelo de clasificación que permita clasificar el precio de las propiedades en venta, utilizando los datos que se han puesto a su disposición correspondientes al año 2020.
-​
-Para esto, específicamente, debe predecir la **categorización** de las propiedades entre baratas o caras, considerando como criterio el valor promedio de los precios (la media). 
-​
-## Entrega
-​
-Deben tener el código en un script .py o Jupyter Notebook .ipynb, el cual debe incluir un buen EDA, feature engineerging y, de ser posible, un pipeline de Machine Learning para el procesamiento de datos que consideren necesario. Es importante **explicar claramente cada paso realizado** mediante comentarios en el script o textos formato markdown dentro del Notebook, pensar que cualquier persona (en este caso serán los Henry Mentors evaluadores) debe entender de la mejor manera posible cada razonamiento y pasos aplicados.
-​
-Recuerden, además, que deben enviar el repositorio que contenga el proyecto, por lo que es importante que le dediquen tiempo también a esta parte, dejando todo ordenado y con un README acorde, que sirva de introducción al contenido dentro de éste.
-​
-Por otro lado, es obligatorio que el script genere un archivo .csv sólo con las predicciones, teniendo únicamente **una sola columna** (sin index) que debe llamarse 'pred' y tenga todos los valores de las predicciones, con un valor por fila. De no llamarse así la **única columna**, nuestro script de validación **NO LO VA A TOMAR** y no aparecerán en el dashboard.
-​
-El nombre del archivo debe ser su usuario de GitHub, si su usuario de GitHub es 'pjr95', el archivo .csv con las predicciones debe llamarse 'pjr95.csv'. Vamos a validar tanto los datos que suban como el código, por lo que seguir estos pasos es fundamental.
-​
-Cuando entreguen les pedimos que verifiquen que su usuario de GitHub aparezca en el dashboard. En caso de que no aparezca, tal como se comentó más arriba, es debido a que el archivo entregado con las predicciones no cumple con los requisitos solicitados. 
-​
+Se tenían a disposición dos datasets, cada uno con información detallada de ​propiedades a la venta en el territorio colombiano. Uno de ellos destinado a entrenar el modelo y el otro a ponerlo a prueba. 
+En principio, se hizo un análisis exploratorio con tal de verificar que no había propiedades que no deberían pertenecer al dataset. Es decir, se verificó que todas las propiedades estén en Colombia, el tipo de operación sea la venta y que los precios estén expresados en una única moneda.
+En este último apartado es donde se encontró cierta discrepancia: algunas propiedades detallaban su precio en pesos colombianos y otras en dólares estadounidenses. Se realizó una conversión de USD a COP con una cotización de $5069, valor en la fecha de autoría de este informe.
+
+Los valores NaN no sufrieron ninguna modificación ni eliminación, a excepción de los de la columna de precios que fueron quitados ya que no aportaban información esencial para poder determinar la categorización de la propiedad. Los valores iguales a cero fueron mantenidos para hacer más fácil la posterior integración del OneHotEncoder.
+
+Se decidió eliminar las columnas que no aportaban datos relevantes que afecten el precio del inmueble, como el Id, las fechas de los avisos o los datos geográficos.
+
+Analizando el dataset, se encontró que estaba notoriamente desbalanceado. Es decir, había un mayor porcentaje de propiedades "baratas" que "caras". En uno de los modelos planteados aquí se realizó un equilibrado.
+
+Por último, se utilizó el OneHotEncoder para transformar datos de texto a números. Esto es escencial ya que los modelos de ML sólo operan con números
+
+
+## Machine Learning
+
+Se optó por un modelo de árbol Histogram-based Gradient Boosting Classification. La particularidad de este estimador es que permite trabajar con datos NaN.
+
+
 ## Métrica a utilizar
 ​
-Como método de evaluación del desempeño del modelo, se utilizará la métrica de Exhaustividad (Recall) para las propiedades caras, a partir de la matriz de confusión (Confusion Matrix). 
+Como método de evaluación del desempeño del modelo, se utilizó la métrica de Exhaustividad (Recall) para las propiedades caras, a partir de la matriz de confusión (Confusion Matrix). 
 ​
 $$ Recall=\frac{TP}{TP+FN}$$
 ​
 Donde $TP$ son los verdaderos positivos y $FN$ los falsos negativos.
 
 Adicionalmente, se incluye la Accuracy como métrica de control.
-​
-## Archivos provistos
-​
-Se proveen los archivos dentro del archivo comprimido 'properties_colombia.zip':
- - 'properties_colombia_train.csv': Contiene 197549 registros y 26 dimensiones, el cual incluye la información **numérica** del precio.
- - 'propiedades_colombia_test.csv': Contiene 65850 registros y 25 dimensiones, el cual no incluye la información del precio. 
+
+El modelo que mejor valor obtuvo fue el equilibrado.
+
 ​
 ## Descripción de las dimensiones
 - id - Identificador del aviso. No es único: si el aviso es actualizado por la inmobiliaria (nueva versión del aviso) se crea un nuevo registro con la misma id pero distintas fechas: de alta y de baja.
@@ -76,12 +69,3 @@ Se proveen los archivos dentro del archivo comprimido 'properties_colombia.zip':
 - operation_type - Tipo de operación (Venta).
 - geometry - Puntos geométricos formados por las coordenadas latitud y longitud. 
 ​
-## Sugerencias
-​
-- Exploren el dataset. Saquen medidas resumen, vean distribuciones de los datos, analicen bien el tipo de problema, etc.
-- Piensen que tipo de modelo podría ser aplicable según la descripción del problema y el tipo de variable de salida.
-- Busquen información sobre la métrica aplicada, cada métrica tiene pros y contras.
-- Siempre que vean en un dataset coordenadas geoespaciales, es buena estrategia revisar que las mismas correspondan en el mapa al lugar que deberían.
-- Si se presentan comentarios, es una buena oportunidad de aplicar procesamiento del lenguaje natural (NLP) para mejorar nuestro modelo.
-- En cuanto a la utilización de git, recuerden que si quieren hacer un cambio experimental pero no quieren romper el modelo, pueden utilizar [branching](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging).
-- Aprovechen esta instancia de aprendizaje, experimenten y, sobre todo, ¡diviértanse!
